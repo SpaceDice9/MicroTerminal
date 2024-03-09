@@ -2,6 +2,60 @@ local MicroTerminal = {}
 
 local CHAR_SPACE = 32
 
+local RunContext = {}
+RunContext.__index = RunContext
+
+function RunContext:ContainsShortFlag(index, shortFlag)
+	local options = self.Flags[index]
+
+	for _, option in options do
+		if string.match(option, shortFlag) ~= "" then
+			return true
+		end
+	end
+
+	return nil
+end
+
+function RunContext:_GetLongFlag(longFlag, comparisonFlag)
+	local isolatedFlag = string.split(longFlag, "=")
+
+	if isolatedFlag[1] == comparisonFlag then
+		return true, isolatedFlag[2]
+	end
+end
+
+function RunContext:ContainsLongFlag(index, longFlag)
+	local options = self.Flags[index]
+
+	for _, option in options do
+		local exists, stringValue = self:_GetLongFlag(option, longFlag)
+
+		if exists then
+			return stringValue or true
+		end
+	end
+
+	return nil
+end
+
+function RunContext:ContainsFlags(index, ...)
+	local flags = {...}
+	local value = nil
+
+	for _, flag in flags do
+		if MicroTerminal.IsLongFlag(flag) then
+			value = self:ContainsLongFlag(index, flag)
+		else
+			value = self:ContainsShortFlag(index, flag)
+		end
+
+		if value ~= nil then
+			return value
+		end
+	end
+end
+
 function MicroTerminal._GetEndOfTokenIndex(charArray, init)
 	for i = init, #charArray do
 		local char = charArray[i]
@@ -26,6 +80,18 @@ function MicroTerminal._GetNextTokenIndex(charArray, init)
 	return #charArray
 end
 
+function MicroTerminal.IsFlag(token)
+	return string.match(token, "^%-")
+end
+
+function MicroTerminal.IsLongFlag(token)
+	return string.match(token, "^%-%-")
+end
+
+function MicroTerminal.IsShortFlag(token)
+	return (MicroTerminal.IsFlag(token) and not MicroTerminal.IsLongFlag(token))
+end
+
 function MicroTerminal.GetTokens(inputString)
 	local tokens = {}
 	local charArray = {string.byte(inputString, 1, string.len(inputString))}
@@ -45,6 +111,27 @@ function MicroTerminal.GetTokens(inputString)
 	end
 
 	return tokens
+end
+
+function MicroTerminal.TokensToRunContext(tokens)
+	local runContext = {
+		Params = {},
+		Flags = {}
+	}
+
+	for _, token in tokens do
+		if MicroTerminal.IsFlag(token) then
+			local options = runContext.Flags[#runContext.Flags]
+			table.insert(options, token)
+		else
+			table.insert(runContext.Params, token)
+			table.insert(runContext.Flags, {})
+		end
+	end
+
+	setmetatable(runContext, RunContext)
+
+	return runContext
 end
 
 return MicroTerminal
