@@ -1,6 +1,7 @@
 local MicroTerminal = {}
 
 local CHAR_SPACE = 32
+local CHAR_BACKSLASH = 92
 
 local RunContext = {}
 RunContext.__index = RunContext
@@ -57,10 +58,23 @@ function RunContext:ContainsFlags(index, ...)
 end
 
 function MicroTerminal._GetEndOfTokenIndex(charArray, init)
+	local escaping = false
+
 	for i = init, #charArray do
 		local char = charArray[i]
 
-		if char == CHAR_SPACE then
+		if escaping then
+			escaping = false
+			continue
+		end
+
+		if char == CHAR_BACKSLASH then
+			escaping = true
+
+			-- removes the backslash from the string
+			table.remove(charArray, i)
+			i -= 1
+		elseif char == CHAR_SPACE then
 			return i
 		end
 	end
