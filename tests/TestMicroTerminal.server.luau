@@ -1,0 +1,106 @@
+--[[ Test for MicroTerminal ]]
+
+local BytLib = require(script.BytLib)
+local microTerminal = BytLib.Require(game.ServerStorage.MicroTerminal)
+
+print("        [[ Test MicroTerminal ]]")
+
+function toCharArray(str)
+	return {string.byte(str, 1, string.len(str))}
+end
+
+local passed = true
+
+do
+	passed = true
+		and (microTerminal._GetEndOfTokenIndex(toCharArray "gdex --readout", 1) == 5)
+		and (microTerminal._GetEndOfTokenIndex(toCharArray "gdex --readout", 6) == 15)
+		and (microTerminal._GetEndOfTokenIndex(toCharArray "gdex --readout --verbose", 6) == 15)
+		and (microTerminal._GetEndOfTokenIndex(toCharArray "gdex--readout", 1) == 14)
+	print("_GetEndOfTokenIndex", passed)
+end
+
+do
+	passed = true
+		and (microTerminal._GetNextTokenIndex(toCharArray "   gdex", 1) == 4)
+		and (microTerminal._GetNextTokenIndex(toCharArray "gdex --readout", 5) == 6)
+		and (microTerminal._GetNextTokenIndex(toCharArray "gdex --readout  ", 15) == 16)
+	print("_GetNextTokenIndex", passed)
+end
+
+function table_compare(t1, t2)
+	for k, v in t1 do
+		if v ~= t2[k] then
+			return false
+		end
+	end
+
+	for k, v in t2 do
+		if v ~= t1[k] then
+			return false
+		end
+	end
+
+	return true
+end
+
+do
+	passed = true
+		and table_compare({"gdex"}, microTerminal.GetTokens("gdex "))
+		and table_compare({"gdex", "--readout"}, microTerminal.GetTokens("gdex --readout"))
+		and table_compare({"gdex", "--readout", "-v"}, microTerminal.GetTokens("gdex  --readout  -v"))
+		and table_compare({"gdex", "--readout", "-v"}, microTerminal.GetTokens("gdex  --readout  -v   "))
+	print("GetTokens", passed)
+end
+
+do
+	passed = true
+		and (microTerminal.IsFlag("--"))
+		and (microTerminal.IsFlag("--verbose"))
+		and (microTerminal.IsFlag("--tmode=skipall"))
+		and (microTerminal.IsFlag("-v"))
+		and (microTerminal.IsFlag("-"))
+		and (not microTerminal.IsFlag("verbose"))
+		and (not microTerminal.IsFlag("a--verbose"))
+	print("IsFlag", passed)
+end
+
+do
+	passed = true
+		and (microTerminal.IsLongFlag("--"))
+		and (microTerminal.IsLongFlag("--verbose"))
+		and (microTerminal.IsLongFlag("--tmode=skipall"))
+		and (not microTerminal.IsLongFlag("-v"))
+		and (not microTerminal.IsLongFlag("-"))
+		and (not microTerminal.IsLongFlag("verbose"))
+		and (not microTerminal.IsLongFlag("a--verbose"))
+	print("IsLongFlag", passed)
+end
+
+do
+	passed = true
+		and (not microTerminal.IsShortFlag("--"))
+		and (not microTerminal.IsShortFlag("--verbose"))
+		and (not microTerminal.IsShortFlag("--tmode=skipall"))
+		and (microTerminal.IsShortFlag("-v"))
+		and (microTerminal.IsShortFlag("-"))
+		and (not microTerminal.IsShortFlag("verbose"))
+		and (not microTerminal.IsShortFlag("a--verbose"))
+	print("IsShortFlag", passed)
+end
+
+local runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --catalog -vbucks --verbose --tmode=shallow ./field --readout -I"))
+
+do
+	passed = true
+		and (runContext:ContainsFlags(1, "-v"))
+		and (runContext:ContainsFlags(1, "-v", "--verbose"))
+		and (runContext:ContainsFlags(1, "--verbose", "-v"))
+		and (runContext:ContainsFlags(1, "--catalog", "-c"))
+		and (not runContext:ContainsFlags(1, "--readout"))
+		and (runContext:ContainsFlags(1, "--tmode", "-T") == "shallow")
+
+		and (runContext:ContainsFlags(2, "--readout"))
+		and (runContext:ContainsFlags(2, "-I"))
+	print("runContext:ContainsFlags", passed)
+end

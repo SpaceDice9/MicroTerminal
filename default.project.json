@@ -6,6 +6,14 @@
     "ServerStorage": {
       "MicroTerminal": {
         "$path": "src"
+      },
+      
+      "BytLocalSync": {
+        "$className": "Folder",
+
+        "TestMicroTerminal": {
+          "$path": "tests/TestMicroTerminal.server.luau"
+        }
       }
     }
   }
