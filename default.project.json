@@ -1,0 +1,12 @@
+{
+  "name": "MicroTerminal",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerStorage": {
+      "MicroTerminal": {
+        "$path": "src"
+      }
+    }
+  }
+}
