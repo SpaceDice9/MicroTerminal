@@ -109,6 +109,27 @@ do
 	print("runContext:ContainsFlags", passed)
 end
 
+runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --vbucks=100 --cash= --verbose --tmode=shallow --readout=/Workspace --nmode=false"))
+
+do
+	passed = true
+		and (runContext:ContainsFlags(1, "--tmode={string}") == "shallow")
+		and (runContext:ContainsFlags(1, "--vbucks={number}") == 100)
+		and (runContext:ContainsFlags(1, "--cash={number}") == nil)
+		and (runContext:ContainsFlags(1, "--readout={instance}") == workspace)
+		and (runContext:ContainsFlags(1, "--nmode={boolean}") == false)
+	print("runContext:ContainsFlags [expectors]", passed)
+end
+
+do
+	passed = true
+		and (microTerminal.GetInstanceFromPath("/Workspace") == workspace)
+		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate") == workspace.Baseplate)
+		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate/Texture/..") == workspace.Baseplate)
+		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate/Texture.Parent") == workspace.Baseplate)
+	print("GetInstanceFromPath", passed)
+end
+
 do
 	passed = true
 		and (runContext._GetExpectationFromComparisonFlag("--nmode={number}") == microTerminal.Expectors.number)
