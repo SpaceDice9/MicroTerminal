@@ -1,4 +1,5 @@
 local Selection = game:GetService("Selection")
+local LogService = game:GetService("LogService")
 
 local MicroTerminal = {}
 
@@ -337,6 +338,34 @@ function MicroTerminal.TokensToRunContext(tokens)
 	setmetatable(runContext, RunContext)
 
 	return runContext
+end
+
+function MicroTerminal.Print(value)
+	task.defer(print, ">> ", value)
+end
+
+function MicroTerminal.PrintCommand(commandString)
+	task.defer(print, "> --" .. commandString)
+end
+
+function MicroTerminal.RegisterCommand(prefix, func)
+	LogService.MessageOut:Connect(function(message, messageType)
+		if messageType ~= Enum.MessageType.MessageOutput then
+			return
+		end
+
+		if string.sub(message, 1, 4 + string.len(prefix)) == "> --" .. prefix then
+			local commandString = string.sub(message, 5)
+			local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
+			local returnValue = func(runContext)
+
+			if returnValue == nil then
+				return
+			end
+
+			MicroTerminal.Print(returnValue)
+		end
+	end)
 end
 
 MicroTerminal.Expectors = Expectors
