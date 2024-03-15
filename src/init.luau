@@ -349,7 +349,7 @@ function MicroTerminal.PrintCommand(commandString)
 end
 
 function MicroTerminal.RegisterCommand(prefix, func)
-	LogService.MessageOut:Connect(function(message, messageType)
+	return LogService.MessageOut:Connect(function(message, messageType)
 		if messageType ~= Enum.MessageType.MessageOutput then
 			return
 		end
