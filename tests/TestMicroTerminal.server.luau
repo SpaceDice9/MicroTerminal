@@ -89,18 +89,32 @@ do
 	print("IsShortFlag", passed)
 end
 
-local runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --catalog -vbucks --verbose --tmode=shallow ./field --readout -I"))
+local runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex -abc --vbucks=100 --cash= --verbose --tmode=shallow ./field --readout --nmode=false -I"))
 
 do
 	passed = true
 		and (runContext:ContainsFlags(1, "-v"))
 		and (runContext:ContainsFlags(1, "-v", "--verbose"))
-		and (runContext:ContainsFlags(1, "--verbose", "-v"))
 		and (runContext:ContainsFlags(1, "--catalog", "-c"))
 		and (not runContext:ContainsFlags(1, "--readout"))
-		and (runContext:ContainsFlags(1, "--tmode", "-T") == "shallow")
+
+		and (runContext:ContainsFlags(1, "--tmode={string}", "-T") == "shallow")
+		and (runContext:ContainsFlags(1, "--vbucks={number}") == 100)
+		and (runContext:ContainsFlags(1, "--cash={number}") == nil)
 
 		and (runContext:ContainsFlags(2, "--readout"))
 		and (runContext:ContainsFlags(2, "-I"))
+		and (runContext:ContainsFlags(2, "--readout={exists}"))
+		and (runContext:ContainsFlags(2, "--nmode={boolean}") == false)
 	print("runContext:ContainsFlags", passed)
+end
+
+do
+	passed = true
+		and (runContext._GetExpectationFromComparisonFlag("--nmode={number}") == microTerminal.Expectors.number)
+		and (runContext._GetExpectationFromComparisonFlag("--nmode={boolean}") == microTerminal.Expectors.boolean)
+		and (not runContext._GetExpectationFromComparisonFlag("--nmode={boolean}{}"))
+		and (runContext._GetExpectationFromComparisonFlag("--nmode={string}") == microTerminal.Expectors.string)
+		and (runContext._GetExpectationFromComparisonFlag("--nmode={exists}") == microTerminal.Expectors.exists)
+	print("runContext._GetExpectationFromComparisonFlag", passed)
 end

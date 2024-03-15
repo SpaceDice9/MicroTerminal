@@ -3,8 +3,51 @@ local MicroTerminal = {}
 local CHAR_SPACE = 32
 local CHAR_BACKSLASH = 92
 
+local Expectors = {}
+
+function Expectors.boolean(valueString)
+	if valueString == "true" then
+		return true, true
+	elseif valueString == "false" then
+		return true, false
+	end
+
+	return false, nil
+end
+
+function Expectors.number(valueString)
+	if tonumber(valueString) then
+		return true, tonumber(valueString)
+	end
+
+	return false, nil
+end
+
+function Expectors.string(valueString)
+	return true, valueString
+end
+
+function Expectors.exists(valueString)
+	return true, true
+end
+
 local RunContext = {}
 RunContext.__index = RunContext
+
+function RunContext._GetExpectationFromComparisonFlag(comparisonFlag)
+	local isolatedFlag = string.split(comparisonFlag, "=")
+
+	if #isolatedFlag == 1 then
+		return
+	end
+
+	local expectorName = string.match(isolatedFlag[2], "^{(.+)}$")
+	local expector = Expectors[expectorName]
+
+	if expector then
+		return expector
+	end
+end
 
 function RunContext:ContainsShortFlag(index, shortFlag)
 	local options = self.Flags[index]
@@ -20,9 +63,14 @@ end
 
 function RunContext:_GetLongFlag(longFlag, comparisonFlag)
 	local isolatedFlag = string.split(longFlag, "=")
+	local isolatedComparisonFlag = string.split(comparisonFlag, "=")
 
-	if isolatedFlag[1] == comparisonFlag then
-		return true, isolatedFlag[2]
+	if isolatedFlag[1] == isolatedComparisonFlag[1] then
+		local valueString = isolatedFlag[2]
+		local expector = RunContext._GetExpectationFromComparisonFlag(comparisonFlag) or Expectors.exists
+		local success, value = expector(valueString)
+
+		return true, value
 	end
 end
 
@@ -30,10 +78,10 @@ function RunContext:ContainsLongFlag(index, longFlag)
 	local options = self.Flags[index]
 
 	for _, option in options do
-		local exists, stringValue = self:_GetLongFlag(option, longFlag)
+		local exists, value = self:_GetLongFlag(option, longFlag)
 
 		if exists then
-			return stringValue or true
+			return value
 		end
 	end
 
@@ -147,5 +195,7 @@ function MicroTerminal.TokensToRunContext(tokens)
 
 	return runContext
 end
+
+MicroTerminal.Expectors = Expectors
 
 return MicroTerminal
