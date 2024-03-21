@@ -7,6 +7,16 @@
       "MicroTerminal": {
         "$path": "src"
       },
+      "ImpPlugin": {
+        "$className": "Folder",
+
+        "MicroTerminal": {
+          "$path": "src"
+        },
+        "ImpMain": {
+          "$path": "examples/imp.server.luau"
+        }
+      },
       
       "BytLocalSync": {
         "$className": "Folder",
