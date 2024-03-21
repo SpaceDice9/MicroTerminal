@@ -197,7 +197,7 @@ function RunContext:ContainsShortFlag(index, shortFlag)
 	local options = self.Flags[index]
 
 	for _, option in options do
-		if string.match(option, shortFlag) ~= "" then
+		if MicroTerminal.IsShortFlag(option) and string.match(option, shortFlag) ~= "" then
 			return true
 		end
 	end
