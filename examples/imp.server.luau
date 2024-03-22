@@ -88,12 +88,14 @@ function imp(runContext)
 	local no_packing = runContext:ContainsFlags(1, "--no-packing")
 	local packName = runContext:ContainsFlags(1, "--pack={string}")
 
-	if help or not runContext.Params[2] then
+	local ref = runContext:Param(2)
+	local parent = runContext:Param(3, "instance") or workspace
+
+	if help or not ref then
 		printHelp()
 		return
 	end
 
-	local ref = runContext.Params[2]
 	local assetId = getAssetId(ref)
 	local assets = getAsset(assetId)
 	local assetAmount = #assets
@@ -109,12 +111,6 @@ function imp(runContext)
 
 		parentAll(packetFolder, assets)
 		assets = {packetFolder}
-	end
-
-	local parent = Selection:Get()[1] or workspace
-
-	if runContext.Params[3] then
-		parent = MicroTerminal.GetInstanceFromPath(runContext.Params[3])
 	end
 
 	parentAll(parent, assets)
