@@ -42,8 +42,19 @@ function tryAccessProperty(instance, property)
 	end)
 end
 
+function tryGetFirstSelection()
+	local success, selected = pcall(function()
+		return Selection:Get()
+	end)
+
+	if success then
+		return selected[1]
+	end
+end
+
+
 function MicroTerminal.GetInstanceFromPath(path: string)
-	local focus = Selection:Get()[1] or workspace
+	local focus = tryGetFirstSelection() or workspace
 	local player = game.Players.LocalPlayer
 	local root = nil
 	local init = 1
