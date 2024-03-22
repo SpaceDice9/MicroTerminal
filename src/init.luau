@@ -251,6 +251,26 @@ function RunContext:ContainsFlags(index: number, ...: string): any
 	end
 end
 
+function RunContext:Param(index: number, expectation: string?): any
+	local param = self.Params[index]
+	local value = param
+
+	if not param then
+		return
+	end
+
+	if expectation then
+		local expector = Expectors[expectation]
+
+		if expector then
+			local success
+			success, value = expector(param)
+		end
+	end
+
+	return value
+end
+
 function MicroTerminal._GetEndOfTokenIndex(charArray, init)
 	local escaping = false
 
