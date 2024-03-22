@@ -1,13 +1,15 @@
 local Selection = game:GetService("Selection")
 local LogService = game:GetService("LogService")
 
+local Types = require(script.types)
+
 local MicroTerminal = {}
 
 local CHAR_SPACE = 32
 local CHAR_BACKSLASH = 92
 local MAX_INSTANCE_PATH_RESOLVE = 1000
 
-local Expectors = {}
+local Expectors: {[string]: Expector} = {}
 
 function getPatternContext(str, pattern, init, plain)
 	local match = string.match(str, pattern, init)
@@ -40,7 +42,7 @@ function tryAccessProperty(instance, property)
 	end)
 end
 
-function MicroTerminal.GetInstanceFromPath(path)
+function MicroTerminal.GetInstanceFromPath(path: string)
 	local focus = Selection:Get()[1] or workspace
 	local player = game.Players.LocalPlayer
 	local root = nil
@@ -193,7 +195,7 @@ function RunContext._GetExpectationFromComparisonFlag(comparisonFlag)
 	end
 end
 
-function RunContext:ContainsShortFlag(index, shortFlag)
+function RunContext:ContainsShortFlag(index: number, shortFlag: string): true | nil
 	local options = self.Flags[index]
 
 	for _, option in options do
@@ -218,7 +220,7 @@ function RunContext:_GetLongFlag(longFlag, comparisonFlag)
 	end
 end
 
-function RunContext:ContainsLongFlag(index, longFlag)
+function RunContext:ContainsLongFlag(index: number, longFlag: string): any
 	local options = self.Flags[index]
 
 	for _, option in options do
@@ -232,7 +234,7 @@ function RunContext:ContainsLongFlag(index, longFlag)
 	return nil
 end
 
-function RunContext:ContainsFlags(index, ...)
+function RunContext:ContainsFlags(index: number, ...: string): any
 	local flags = {...}
 	local value = nil
 
@@ -286,19 +288,19 @@ function MicroTerminal._GetNextTokenIndex(charArray, init)
 	return #charArray
 end
 
-function MicroTerminal.IsFlag(token)
-	return string.match(token, "^%-")
+function MicroTerminal.IsFlag(token: string): boolean
+	return not not string.match(token, "^%-")
 end
 
-function MicroTerminal.IsLongFlag(token)
-	return string.match(token, "^%-%-")
+function MicroTerminal.IsLongFlag(token: string): boolean
+	return not not string.match(token, "^%-%-")
 end
 
-function MicroTerminal.IsShortFlag(token)
+function MicroTerminal.IsShortFlag(token: string): boolean
 	return (MicroTerminal.IsFlag(token) and not MicroTerminal.IsLongFlag(token))
 end
 
-function MicroTerminal.GetTokens(inputString)
+function MicroTerminal.GetTokens(inputString: string): {string}
 	local tokens = {}
 	local charArray = {string.byte(inputString, 1, string.len(inputString))}
 	local cursor = 1
@@ -319,7 +321,7 @@ function MicroTerminal.GetTokens(inputString)
 	return tokens
 end
 
-function MicroTerminal.TokensToRunContext(tokens)
+function MicroTerminal.TokensToRunContext(tokens: {string}): RunContext
 	local runContext = {
 		Params = {},
 		Flags = {}
@@ -340,15 +342,15 @@ function MicroTerminal.TokensToRunContext(tokens)
 	return runContext
 end
 
-function MicroTerminal.Print(value)
+function MicroTerminal.Print(value: any)
 	task.defer(print, ">> ", value)
 end
 
-function MicroTerminal.PrintCommand(commandString)
+function MicroTerminal.PrintCommand(commandString: string)
 	task.defer(print, "> --" .. commandString)
 end
 
-function MicroTerminal.RegisterCommand(prefix, func)
+function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
 	return LogService.MessageOut:Connect(function(message, messageType)
 		if messageType ~= Enum.MessageType.MessageOutput then
 			return
@@ -369,5 +371,8 @@ function MicroTerminal.RegisterCommand(prefix, func)
 end
 
 MicroTerminal.Expectors = Expectors
+
+export type RunContext = Types.RunContext
+export type Expector = Types.Expector
 
 return MicroTerminal
