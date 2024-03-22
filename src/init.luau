@@ -214,7 +214,7 @@ function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (st
 			return
 		end
 
-		if string.sub(message, 1, 4 + string.len(prefix)) ~= "> --" .. prefix then
+		if string.sub(message, 1, 4 + string.len(prefix) + 1) ~= "> --" .. prefix .. " " then
 			return
 		end
 
