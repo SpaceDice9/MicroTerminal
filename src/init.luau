@@ -11,7 +11,7 @@ local CHAR_BACKSLASH = 92
 
 local Expectors: {[string]: Expector} = require(script.expectors)
 
-function MicroTerminal.GetInstanceFromPath(path: string)
+function MicroTerminal.GetInstanceFromPath(path: string): Instance?
 	return Util.GetInstanceFromPath(path)
 end
 
