@@ -8,6 +8,31 @@ export type RunContext = {
 	Param: (self: RunContext, index: number, expectation: string?) -> (any),
 }
 
+export type GoodSignalConnection = {
+	Disconnect: (self: GoodSignalConnection) -> (),
+}
+
+export type GoodSignal = {
+	Connect: (self: GoodSignal, fn: (...any) -> ()) -> GoodSignalConnection,
+	DisconnectAll: (self: GoodSignal) -> (),
+	Destroy: (self: GoodSignal) -> (),
+	Fire: (self: GoodSignal, ...any) -> (),
+	Wait: (self: GoodSignal) -> (...any),
+	Once: (self: GoodSignal, fn: (...any) -> ()) -> GoodSignalConnection,
+}
+
+export type TerminalLog = {
+	Log: {any},
+	MaxLogLength: number,
+
+	OnInput: GoodSignal,
+	OnOutput: GoodSignal,
+	OnLog: GoodSignal,
+
+	Input: (self: TerminalLog, input: any, inputType: string?) -> (),
+	Output: (self: TerminalLog, output: any, outputType: string?) -> (),
+}
+
 export type Expector = (valueString: string) -> (boolean, any)
 
 return {}

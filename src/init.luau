@@ -204,8 +204,29 @@ function MicroTerminal.Print(value: any)
 	task.defer(print, ">> ", value)
 end
 
+function MicroTerminal.OutputToLog(terminalLog, value: any)
+	terminalLog:Output(value)
+end
+
 function MicroTerminal.PrintCommand(commandString: string)
 	task.defer(print, "> --" .. commandString)
+end
+
+function MicroTerminal.RunCommand(commandString: string, func: (RunContext) -> (string?)): any
+	local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
+	return func(runContext)
+end
+
+function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: Types.TerminalLog, func: (RunContext) -> (string?))
+	terminalLog.OnInput:Connect(function(commandString)
+		local returnValue = MicroTerminal.RunCommand(commandString, func)
+
+		if returnValue == nil then
+			return
+		else
+			terminalLog:Output(returnValue, "Print")
+		end
+	end)
 end
 
 function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
@@ -219,8 +240,7 @@ function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (st
 		end
 
 		local commandString = string.sub(message, 5)
-		local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
-		local returnValue = func(runContext)
+		local returnValue = MicroTerminal.RunCommand(commandString, func)
 
 		if returnValue == nil then
 			return
@@ -233,6 +253,9 @@ end
 MicroTerminal.Expectors = Expectors
 
 export type RunContext = Types.RunContext
+export type GoodSignal = Types.GoodSignal
+export type GoodSignalConnection = Types.GoodSignalConnection
+export type TerminalLog = Types.TerminalLog
 export type Expector = Types.Expector
 
 return MicroTerminal

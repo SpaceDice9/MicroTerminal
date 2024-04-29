@@ -1,16 +1,17 @@
 local GoodSignal = require(script.Parent.GoodSignal)
+local Types = require(script.Parent.types)
 
 local TerminalLog = {}
 TerminalLog.__index = TerminalLog
 
-function TerminalLog.new(maxLogLength)
+function TerminalLog.new(maxLogLength: number): Types.TerminalLog
 	local self = {
 		Log = {},
 		MaxLogLength = maxLogLength,
 
-		OnInput = GoodSignal.new(), -- Event
-		OnOutput = GoodSignal.new(), -- Event
-		OnLog = GoodSignal.new(), -- Event
+		OnInput = GoodSignal.new(),
+		OnOutput = GoodSignal.new(),
+		OnLog = GoodSignal.new(),
 	}
 
 	setmetatable(self, TerminalLog)
@@ -24,18 +25,20 @@ function trimLogs(self)
 	end
 end
 
-function TerminalLog:Input(str: string, inputType: string)
-	table.insert(self.Stream, str)
+function TerminalLog:Input(input: any, inputType: string)
+	table.insert(self.Log, input)
 	trimLogs(self)
 
-	self.OnInput:Fire(str, inputType)
-	self.OnLog:Fire(str, inputType)
+	self.OnInput:Fire(input, inputType)
+	self.OnLog:Fire(input, inputType)
 end
 
-function TerminalLog:Output(str: string, outputType: string)
-	table.insert(self.Stream, str)
+function TerminalLog:Output(output: any, outputType: string)
+	table.insert(self.Log, output)
 	trimLogs(self)
 
-	self.OnOutput:Fire(str, outputType)
-	self.OnLog:Fire(str, outputType)
+	self.OnOutput:Fire(output, outputType)
+	self.OnLog:Fire(output, outputType)
 end
+
+return TerminalLog
