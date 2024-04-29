@@ -1,180 +1,18 @@
 local Selection = game:GetService("Selection")
 local LogService = game:GetService("LogService")
 
+local Util = require(script.util)
 local Types = require(script.types)
 
 local MicroTerminal = {}
 
 local CHAR_SPACE = 32
 local CHAR_BACKSLASH = 92
-local MAX_INSTANCE_PATH_RESOLVE = 1000
 
-local Expectors: {[string]: Expector} = {}
+local Expectors: {[string]: Expector} = require(script.expectors)
 
-function getPatternContext(str, pattern, init, plain)
-	local match = string.match(str, pattern, init)
-	local start, finish = string.find(str, pattern, init, plain)
-
-	return match, start, finish
-end
-
-function cut(str, pattern, init)
-	local match, start, finish = getPatternContext(str, pattern, init)
-
-	if match then
-		return match:sub(1, start - 1) .. match:sub(finish + 1, str:len())
-	end
-end
-
-function traverse(instance, toChild, name)
-	if instance then
-		if toChild then
-			return instance:FindFirstChild(name)
-		else
-			return instance.Parent
-		end
-	end
-end
-
-function tryAccessProperty(instance, property)
-	return pcall(function()
-		return instance[property]
-	end)
-end
-
-function MicroTerminal.GetInstanceFromPath(path: string)
-	local focus = Selection:Get()[1] or workspace
-	local player = game.Players.LocalPlayer
-	local root = nil
-	local init = 1
-
-	local unprocessed = path
-
-	if string.match(path, "^%w+") then
-		root = traverse(focus, true, string.match(path, "^%w+"))
-
-		local match, start, finish = getPatternContext(path, "^%w+")
-		init = init + finish
-	elseif string.match(path, "^/%w+") then
-		root = game
-		root = traverse(root, true, string.match(path, "%w+"))
-
-		local match, start, finish = getPatternContext(path, "^/%w+")
-		init = init + finish
-	elseif string.match(path, "^/") then
-		root = game
-
-		local match, start, finish = getPatternContext(path, "^/")
-		init = init + finish
-	elseif player and string.match(path, "^~") then
-		root = player
-
-		local match, start, finish = getPatternContext(path, "^~")
-		init = init + finish
-	elseif string.match(path, "^%.%.") then
-		root = traverse(focus)
-
-		local match, start, finish = getPatternContext(path, "^%.%.")
-		init = init + finish
-	elseif string.match(path, "^%.%w+") then
-		local success, value = tryAccessProperty(focus, string.match(path, "%w+"))
-
-		if not success then
-			return
-		end
-
-		if typeof(value) ~= "Instance" then
-			return
-		end
-
-		root = value
-
-		local match, start, finish = getPatternContext(path, "^%.%w+")
-		init = init + finish
-	elseif string.match(path, "^%.") then
-		root = focus
-
-		local match, start, finish = getPatternContext(path, "^%.")
-		init = init + finish
-	else
-		return
-	end
-
-	local instance = root
-	local n = 0
-
-	while init <= path:len() and n < MAX_INSTANCE_PATH_RESOLVE do
-		unprocessed = path:sub(init, path:len())
-
-		if string.match(unprocessed, "^/%w+") then
-			instance = traverse(instance, true, string.match(unprocessed, "%w+"))
-
-			local match, start, finish = getPatternContext(unprocessed, "^/%w+")
-			init = init + finish
-		elseif string.match(unprocessed, "^/%.%.") then
-			instance = traverse(instance)
-
-			local match, start, finish = getPatternContext(unprocessed, "^/%.%.")
-			init = init + finish
-		elseif string.match(unprocessed, "^%.%w+") then
-			local success, value = tryAccessProperty(instance, string.match(unprocessed, "%w+"))
-
-			if not success then
-				return
-			end
-
-			if typeof(value) ~= "Instance" then
-				return
-			end
-
-			instance = value
-
-			local match, start, finish = getPatternContext(unprocessed, "^%.%w+")
-			init = init + finish
-		else
-			return
-		end
-
-		n = n + 1
-	end
-
-	return instance
-end
-
-function Expectors.boolean(valueString)
-	if valueString == "true" then
-		return true, true
-	elseif valueString == "false" then
-		return true, false
-	end
-
-	return false, nil
-end
-
-function Expectors.number(valueString)
-	if tonumber(valueString) then
-		return true, tonumber(valueString)
-	end
-
-	return false, nil
-end
-
-function Expectors.string(valueString)
-	return true, valueString
-end
-
-function Expectors.instance(valueString)
-	local instance = MicroTerminal.GetInstanceFromPath(valueString)
-
-	if instance then
-		return true, instance
-	end
-
-	return false, nil
-end
-
-function Expectors.exists(valueString)
-	return true, true
+function MicroTerminal.GetInstanceFromPath(path: string): Instance?
+	return Util.GetInstanceFromPath(path)
 end
 
 local RunContext = {}
@@ -376,17 +214,19 @@ function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (st
 			return
 		end
 
-		if string.sub(message, 1, 4 + string.len(prefix)) == "> --" .. prefix then
-			local commandString = string.sub(message, 5)
-			local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
-			local returnValue = func(runContext)
-
-			if returnValue == nil then
-				return
-			end
-
-			MicroTerminal.Print(returnValue)
+		if string.sub(message, 1, 4 + string.len(prefix) + 1) ~= "> --" .. prefix .. " " then
+			return
 		end
+
+		local commandString = string.sub(message, 5)
+		local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
+		local returnValue = func(runContext)
+
+		if returnValue == nil then
+			return
+		end
+
+		MicroTerminal.Print(returnValue)
 	end)
 end
 
