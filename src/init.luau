@@ -7,6 +7,7 @@ local Types = require(script.types)
 local MicroTerminal = {}
 
 local CHAR_SPACE = 32
+local CHAR_DOUBLE_QUOTES = 34
 local CHAR_BACKSLASH = 92
 
 local Expectors: {[string]: Expector} = require(script.expectors)
@@ -110,25 +111,36 @@ function RunContext:Param(index: number, expectation: string?): any
 end
 
 function MicroTerminal._GetEndOfTokenIndex(charArray, init)
-	local escaping = false
+	local startOfToken = init
 
-	for i = init, #charArray do
+	local escaping = false
+	local isWithinString = false
+
+	local i = init
+
+	while i <= #charArray do
 		local char = charArray[i]
 
-		if escaping then
+		if not escaping then
+			if char == CHAR_BACKSLASH then
+				escaping = true
+
+				-- removes the backslash from the string
+				table.remove(charArray, i)
+				i -= 1
+			elseif char == CHAR_DOUBLE_QUOTES then
+				-- removes the double quotes from the string
+				table.remove(charArray, if isWithinString then i else startOfToken)
+				i -= 1
+				isWithinString = not isWithinString
+			elseif char == CHAR_SPACE and not isWithinString then
+				return i
+			end
+		else
 			escaping = false
-			continue
 		end
 
-		if char == CHAR_BACKSLASH then
-			escaping = true
-
-			-- removes the backslash from the string
-			table.remove(charArray, i)
-			i -= 1
-		elseif char == CHAR_SPACE then
-			return i
-		end
+		i += 1
 	end
 
 	return #charArray + 1
