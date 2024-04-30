@@ -229,8 +229,12 @@ function MicroTerminal.RunCommand(commandString: string, func: (RunContext) -> (
 	return func(runContext)
 end
 
-function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, func: (RunContext) -> (string?))
+function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, prefix: string, func: (RunContext) -> (string?))
 	terminalLog.OnInput:Connect(function(commandString)
+		if string.sub(commandString, 1, string.len(prefix) + 1) ~= prefix .. " " then
+			return
+		end
+
 		local returnValue = MicroTerminal.RunCommand(commandString, func)
 
 		if returnValue == nil then
