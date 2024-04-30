@@ -7,6 +7,7 @@ local Types = require(script.types)
 local MicroTerminal = {}
 
 local CHAR_SPACE = 32
+local CHAR_DOUBLE_QUOTES = 34
 local CHAR_BACKSLASH = 92
 
 local Expectors: {[string]: Expector} = require(script.expectors)
@@ -110,25 +111,36 @@ function RunContext:Param(index: number, expectation: string?): any
 end
 
 function MicroTerminal._GetEndOfTokenIndex(charArray, init)
-	local escaping = false
+	local startOfToken = init
 
-	for i = init, #charArray do
+	local escaping = false
+	local isWithinString = false
+
+	local i = init
+
+	while i <= #charArray do
 		local char = charArray[i]
 
-		if escaping then
+		if not escaping then
+			if char == CHAR_BACKSLASH then
+				escaping = true
+
+				-- removes the backslash from the string
+				table.remove(charArray, i)
+				i -= 1
+			elseif char == CHAR_DOUBLE_QUOTES then
+				-- removes the double quotes from the string
+				table.remove(charArray, if isWithinString then i else startOfToken)
+				i -= 1
+				isWithinString = not isWithinString
+			elseif char == CHAR_SPACE and not isWithinString then
+				return i
+			end
+		else
 			escaping = false
-			continue
 		end
 
-		if char == CHAR_BACKSLASH then
-			escaping = true
-
-			-- removes the backslash from the string
-			table.remove(charArray, i)
-			i -= 1
-		elseif char == CHAR_SPACE then
-			return i
-		end
+		i += 1
 	end
 
 	return #charArray + 1
@@ -204,11 +216,36 @@ function MicroTerminal.Print(value: any)
 	task.defer(print, ">> ", value)
 end
 
+function MicroTerminal.OutputToLog(terminalLog: TerminalLog, value: any)
+	terminalLog:Output(value)
+end
+
 function MicroTerminal.PrintCommand(commandString: string)
 	task.defer(print, "> --" .. commandString)
 end
 
-function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
+function MicroTerminal.RunCommand(commandString: string, func: (RunContext) -> (string?)): any
+	local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
+	return func(runContext)
+end
+
+function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, prefix: string, func: (RunContext) -> (string?))
+	terminalLog.OnInput:Connect(function(commandString)
+		if string.sub(commandString, 1, string.len(prefix) + 1) ~= prefix .. " " then
+			return
+		end
+
+		local returnValue = MicroTerminal.RunCommand(commandString, func)
+
+		if returnValue == nil then
+			return
+		else
+			terminalLog:Output(returnValue, "Print")
+		end
+	end)
+end
+
+function MicroTerminal.RegisterCommandToRobloxOutput(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
 	return LogService.MessageOut:Connect(function(message, messageType)
 		if messageType ~= Enum.MessageType.MessageOutput then
 			return
@@ -219,8 +256,7 @@ function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (st
 		end
 
 		local commandString = string.sub(message, 5)
-		local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
-		local returnValue = func(runContext)
+		local returnValue = MicroTerminal.RunCommand(commandString, func)
 
 		if returnValue == nil then
 			return
@@ -233,6 +269,10 @@ end
 MicroTerminal.Expectors = Expectors
 
 export type RunContext = Types.RunContext
+export type GoodSignal = Types.GoodSignal
+export type GoodSignalConnection = Types.GoodSignalConnection
+export type TerminalLog = Types.TerminalLog
+export type OutputType = Types.OutputType
 export type Expector = Types.Expector
 
 return MicroTerminal
