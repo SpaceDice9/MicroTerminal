@@ -122,7 +122,7 @@ function imp(runContext)
 	MicroTerminal.Print(`import loaded { pluralize("asset", "assets", assetAmount) } (x{ assetAmount }) successfully`)
 end
 
-local commandConnection = MicroTerminal.RegisterCommand("!imp", imp)
+local commandConnection = MicroTerminal.RegisterCommandToRobloxOutput("!imp", imp)
 
 plugin.Unloading:Connect(function()
 	commandConnection:Disconnect()

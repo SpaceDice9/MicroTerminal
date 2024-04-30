@@ -241,7 +241,7 @@ function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, fu
 	end)
 end
 
-function MicroTerminal.RegisterCommand(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
+function MicroTerminal.RegisterCommandToRobloxOutput(prefix: string, func: (RunContext) -> (string?)): RBXScriptConnection
 	return LogService.MessageOut:Connect(function(message, messageType)
 		if messageType ~= Enum.MessageType.MessageOutput then
 			return
