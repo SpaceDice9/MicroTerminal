@@ -25,13 +25,20 @@ export type TerminalLog = {
 	Log: {any},
 	MaxLogLength: number,
 
+	Print: "Print",
+	Warn: "Warn",
+	Error: "Error",
+	Info: "Info",
+
 	OnInput: GoodSignal,
 	OnOutput: GoodSignal,
 	OnLog: GoodSignal,
 
 	Input: (self: TerminalLog, input: any, inputType: string?) -> (),
-	Output: (self: TerminalLog, output: any, outputType: string?) -> (),
+	Output: (self: TerminalLog, output: any, outputType: OutputType?) -> (),
 }
+
+export type OutputType = "Print" | "Warn" | "Error" | "Info"
 
 export type Expector = (valueString: string) -> (boolean, any)
 

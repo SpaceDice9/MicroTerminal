@@ -216,7 +216,7 @@ function MicroTerminal.Print(value: any)
 	task.defer(print, ">> ", value)
 end
 
-function MicroTerminal.OutputToLog(terminalLog, value: any)
+function MicroTerminal.OutputToLog(terminalLog: TerminalLog, value: any)
 	terminalLog:Output(value)
 end
 
@@ -229,7 +229,7 @@ function MicroTerminal.RunCommand(commandString: string, func: (RunContext) -> (
 	return func(runContext)
 end
 
-function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: Types.TerminalLog, func: (RunContext) -> (string?))
+function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, func: (RunContext) -> (string?))
 	terminalLog.OnInput:Connect(function(commandString)
 		local returnValue = MicroTerminal.RunCommand(commandString, func)
 
@@ -268,6 +268,7 @@ export type RunContext = Types.RunContext
 export type GoodSignal = Types.GoodSignal
 export type GoodSignalConnection = Types.GoodSignalConnection
 export type TerminalLog = Types.TerminalLog
+export type OutputType = Types.OutputType
 export type Expector = Types.Expector
 
 return MicroTerminal

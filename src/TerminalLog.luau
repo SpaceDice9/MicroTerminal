@@ -1,7 +1,12 @@
 local GoodSignal = require(script.Parent.GoodSignal)
 local Types = require(script.Parent.types)
 
-local TerminalLog = {}
+local TerminalLog = {
+	Print = "Print",
+	Warn = "Warn",
+	Error = "Error",
+	Info = "Info",
+}
 TerminalLog.__index = TerminalLog
 
 function TerminalLog.new(maxLogLength: number): Types.TerminalLog
@@ -25,7 +30,7 @@ function trimLogs(self)
 	end
 end
 
-function TerminalLog:Input(input: any, inputType: string)
+function TerminalLog:Input(input: any, inputType: string?)
 	table.insert(self.Log, input)
 	trimLogs(self)
 
@@ -33,7 +38,7 @@ function TerminalLog:Input(input: any, inputType: string)
 	self.OnLog:Fire(input, inputType)
 end
 
-function TerminalLog:Output(output: any, outputType: string)
+function TerminalLog:Output(output: any, outputType: Types.OutputType?)
 	table.insert(self.Log, output)
 	trimLogs(self)
 
