@@ -1,6 +1,7 @@
 --[[
 	An example demonstrating MicroTerminal in a GUI-less plugin
 	This tool imports assets
+	Type `--!imp -h` in the Command Bar to get started.
 ]]
 
 local Selection = game:GetService("Selection")

@@ -45,6 +45,8 @@ function tryGetFirstSelection()
 	end
 end
 
+-- use ; instead of /
+-- it's really ugly but it wouldn't work with the output any other way
 function Util.GetInstanceFromPath(path: string)
 	local focus = tryGetFirstSelection() or workspace
 	local player = game.Players.LocalPlayer
@@ -58,16 +60,16 @@ function Util.GetInstanceFromPath(path: string)
 
 		local match, start, finish = getPatternContext(path, "^%w+")
 		init = init + finish
-	elseif string.match(path, "^/%w+") then
+	elseif string.match(path, "^;%w+") then
 		root = game
 		root = traverse(root, true, string.match(path, "%w+"))
 
-		local match, start, finish = getPatternContext(path, "^/%w+")
+		local match, start, finish = getPatternContext(path, "^;%w+")
 		init = init + finish
-	elseif string.match(path, "^/") then
+	elseif string.match(path, "^;") then
 		root = game
 
-		local match, start, finish = getPatternContext(path, "^/")
+		local match, start, finish = getPatternContext(path, "^;")
 		init = init + finish
 	elseif player and string.match(path, "^~") then
 		root = player
@@ -109,15 +111,15 @@ function Util.GetInstanceFromPath(path: string)
 	while init <= path:len() and n < MAX_INSTANCE_PATH_RESOLVE do
 		unprocessed = path:sub(init, path:len())
 
-		if string.match(unprocessed, "^/%w+") then
+		if string.match(unprocessed, "^;%w+") then
 			instance = traverse(instance, true, string.match(unprocessed, "%w+"))
 
-			local match, start, finish = getPatternContext(unprocessed, "^/%w+")
+			local match, start, finish = getPatternContext(unprocessed, "^;%w+")
 			init = init + finish
-		elseif string.match(unprocessed, "^/%.%.") then
+		elseif string.match(unprocessed, "^;%.%.") then
 			instance = traverse(instance)
 
-			local match, start, finish = getPatternContext(unprocessed, "^/%.%.")
+			local match, start, finish = getPatternContext(unprocessed, "^;%.%.")
 			init = init + finish
 		elseif string.match(unprocessed, "^%.%w+") then
 			local success, value = tryAccessProperty(instance, string.match(unprocessed, "%w+"))

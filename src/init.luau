@@ -1,6 +1,8 @@
 local Selection = game:GetService("Selection")
 local LogService = game:GetService("LogService")
 
+local TerminalLog = require(script.TerminalLog)
+
 local Util = require(script.util)
 local Types = require(script.types)
 
@@ -227,6 +229,31 @@ end
 function MicroTerminal.RunCommand(commandString: string, func: (RunContext) -> (string?)): any
 	local runContext = MicroTerminal.TokensToRunContext(MicroTerminal.GetTokens(commandString))
 	return func(runContext)
+end
+
+function MicroTerminal.BindTerminalLogToRobloxOutput(terminalLog: TerminalLog): (RBXScriptConnection, GoodSignalConnection)
+	local outputConnection = terminalLog.OnOutput:Connect(function(output: any, outputType: OutputType)
+		if outputType == TerminalLog.Print then
+			MicroTerminal.Print(output)
+		elseif outputType == TerminalLog.Warn then
+			task.defer(warn, ">> ", output)
+		end
+	end)
+
+	local messageOutConnection = game:GetService("LogService").MessageOut:Connect(function(message: string, messageType: Enum.MessageType)
+		if messageType ~= Enum.MessageType.MessageOutput then
+			return
+		end
+
+		if string.sub(message, 1, 4) ~= "> --" then
+			return
+		end
+
+		local commandString = string.sub(message, 5)
+		terminalLog:Input(commandString)
+	end)
+
+	return messageOutConnection, outputConnection
 end
 
 function MicroTerminal.RegisterCommandToTerminalLog(terminalLog: TerminalLog, prefix: string, func: (RunContext) -> (string?))
