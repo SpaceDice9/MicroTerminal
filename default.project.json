@@ -5,13 +5,21 @@
 
     "ServerStorage": {
       "MicroTerminal": {
-        "$path": "src"
+        "$path": "src",
+
+        "Packages": {
+          "$path": "Packages"
+        }
       },
       "ImpPlugin": {
         "$className": "Folder",
 
         "MicroTerminal": {
-          "$path": "src"
+          "$path": "src",
+
+          "Packages": {
+            "$path": "Packages"
+          }
         },
         "ImpMain": {
           "$path": "examples/imp.server.luau"
