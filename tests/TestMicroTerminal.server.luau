@@ -109,7 +109,7 @@ do
 	print("runContext:ContainsFlags", passed)
 end
 
-runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --vbucks=100 --cash= --verbose --tmode=shallow --readout=/Workspace --nmode=false"))
+runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --vbucks=100 --cash= --verbose --tmode=shallow --readout=;Workspace --nmode=false"))
 
 do
 	passed = true
@@ -123,10 +123,10 @@ end
 
 do
 	passed = true
-		and (microTerminal.GetInstanceFromPath("/Workspace") == workspace)
-		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate") == workspace.Baseplate)
-		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate/Texture/..") == workspace.Baseplate)
-		and (microTerminal.GetInstanceFromPath("/Workspace/Baseplate/Texture.Parent") == workspace.Baseplate)
+		and (microTerminal.GetInstanceFromPath(";Workspace") == workspace)
+		and (microTerminal.GetInstanceFromPath(";Workspace;Baseplate") == workspace.Baseplate)
+		and (microTerminal.GetInstanceFromPath(";Workspace;Baseplate;Texture;..") == workspace.Baseplate)
+		and (microTerminal.GetInstanceFromPath(";Workspace;Baseplate;Texture.Parent") == workspace.Baseplate)
 	print("GetInstanceFromPath", passed)
 end
 
