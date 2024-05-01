@@ -1,4 +1,4 @@
-local GoodSignal = require(script.Parent.GoodSignal)
+local GoodSignal = require(script.Parent.Packages.goodsignal)
 local Types = require(script.Parent.types)
 
 local TerminalLog = {

@@ -15,7 +15,6 @@ export type GoodSignalConnection = {
 export type GoodSignal = {
 	Connect: (self: GoodSignal, fn: (...any) -> ()) -> GoodSignalConnection,
 	DisconnectAll: (self: GoodSignal) -> (),
-	Destroy: (self: GoodSignal) -> (),
 	Fire: (self: GoodSignal, ...any) -> (),
 	Wait: (self: GoodSignal) -> (...any),
 	Once: (self: GoodSignal, fn: (...any) -> ()) -> GoodSignalConnection,

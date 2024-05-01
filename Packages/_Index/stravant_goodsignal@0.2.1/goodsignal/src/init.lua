@@ -123,10 +123,6 @@ function Signal:DisconnectAll()
 	self._handlerListHead = false
 end
 
-function Signal:Destroy()
-	self._handlerListHead = false
-end
-
 -- Signal:Fire(...) implemented by running the handler functions on the
 -- coRunnerThread, and any time the resulting thread yielded without returning
 -- to us, that means that it yielded to the Roblox scheduler and has been taken
