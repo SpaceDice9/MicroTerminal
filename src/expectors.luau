@@ -129,7 +129,7 @@ function Expectors.enum(valueString)
 	local enumItem = enum[enumNames[2]]
 
 	if enumItem then
-		return true, enumNames
+		return true, enumItem
 	else
 		return false, nil
 	end
