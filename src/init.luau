@@ -132,7 +132,7 @@ function MicroTerminal._GetEndOfTokenIndex(charArray, init)
 				i -= 1
 			elseif char == CHAR_DOUBLE_QUOTES then
 				-- removes the double quotes from the string
-				table.remove(charArray, if isWithinString then i else startOfToken)
+				table.remove(charArray, i)
 				i -= 1
 				isWithinString = not isWithinString
 			elseif char == CHAR_SPACE and not isWithinString then

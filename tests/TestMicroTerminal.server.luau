@@ -155,7 +155,7 @@ do -- Expector.*
 		allTestsPassed = allTestsPassed and passed
 	end
 
-	runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --str-1=Faze --str-2=Et\\ tu --str-3=\\\"Et tu, Brute?\\\""))
+	runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --str-1=Faze --str-2=Et\\ tu --str-3=\"Et tu, Brute?\""))
 
 	do -- Expector.string
 		passed = true
@@ -196,7 +196,7 @@ do -- Expector.*
 		allTestsPassed = allTestsPassed and passed
 	end
 
-	runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --stra-1=Lorem,Lorem\\ ipsum,\\\"Lorem ipsum\\\""))
+	runContext = microTerminal.TokensToRunContext(microTerminal.GetTokens("gdex --stra-1=Lorem,Lorem\\ ipsum,\"Lorem ipsum\""))
 
 	do -- Expector.strarray
 		passed = true
