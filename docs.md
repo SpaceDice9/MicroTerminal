@@ -73,6 +73,24 @@ Registers a command to Roblox console.
 Runs a command directly.
 
 
+## InstancePath
+An object used to resolve instance paths with custom roots, foci and homes.
+
+### Fields
+
+### `Instance .Root`
+
+### `Instance .Home`
+
+### `Instance .Focus`
+
+### Methods
+
+### `InstancePath .new(Instance root, Instance home, Instance focus)`
+
+### `Instance? :Resolve(string path)`
+
+
 ## TerminalLog
 Used for simulating a terminal. Only use this for more technical uses of MT.
 
