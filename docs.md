@@ -19,7 +19,7 @@ Gives whether the command has a long flag at index. If an expectation is set thi
 Gives whether the command has at least one of several flags at index. If an expectation is set this will try to typecast into that.
 
 
-### `any :Param(int index, string? expectation)`
+### `any :Param(int index, (string | Expector)? expectation)`
 
 Gives a parameter at index. If an expectation is set this will try to typecast into that.
 
@@ -71,6 +71,24 @@ Registers a command to Roblox console.
 
 ### `any .RunCommand(string commandString, ((RunContext) -> (string?)) func)`
 Runs a command directly.
+
+
+## InstancePath
+An object used to resolve instance paths with custom roots, foci and homes.
+
+### Fields
+
+### `Instance .Root`
+
+### `Instance .Home`
+
+### `Instance .Focus`
+
+### Methods
+
+### `InstancePath .new(Instance root, Instance home, Instance focus)`
+
+### `Instance? :Resolve(string path)`
 
 
 ## TerminalLog

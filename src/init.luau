@@ -92,7 +92,7 @@ function RunContext:ContainsFlags(index: number, ...: string): any
 	end
 end
 
-function RunContext:Param(index: number, expectation: string?): any
+function RunContext:Param(index: number, expectation: (string | Expector)?): any
 	local param = self.Params[index]
 	local value = param
 
@@ -100,13 +100,16 @@ function RunContext:Param(index: number, expectation: string?): any
 		return
 	end
 
-	if expectation then
+	if typeof(expectation) == "string" then
 		local expector = Expectors[expectation]
 
 		if expector then
 			local success
 			success, value = expector(param)
 		end
+	elseif typeof(expectation) == "function" then
+		local success
+		success, value = expectation(param)
 	end
 
 	return value
@@ -132,7 +135,7 @@ function MicroTerminal._GetEndOfTokenIndex(charArray, init)
 				i -= 1
 			elseif char == CHAR_DOUBLE_QUOTES then
 				-- removes the double quotes from the string
-				table.remove(charArray, if isWithinString then i else startOfToken)
+				table.remove(charArray, i)
 				i -= 1
 				isWithinString = not isWithinString
 			elseif char == CHAR_SPACE and not isWithinString then
