@@ -92,7 +92,7 @@ function RunContext:ContainsFlags(index: number, ...: string): any
 	end
 end
 
-function RunContext:Param(index: number, expectation: string?): any
+function RunContext:Param(index: number, expectation: (string | Expector)?): any
 	local param = self.Params[index]
 	local value = param
 
@@ -100,13 +100,16 @@ function RunContext:Param(index: number, expectation: string?): any
 		return
 	end
 
-	if expectation then
+	if typeof(expectation) == "string" then
 		local expector = Expectors[expectation]
 
 		if expector then
 			local success
 			success, value = expector(param)
 		end
+	elseif typeof(expectation) == "function" then
+		local success
+		success, value = expectation(param)
 	end
 
 	return value

@@ -19,7 +19,7 @@ Gives whether the command has a long flag at index. If an expectation is set thi
 Gives whether the command has at least one of several flags at index. If an expectation is set this will try to typecast into that.
 
 
-### `any :Param(int index, string? expectation)`
+### `any :Param(int index, (string | Expector)? expectation)`
 
 Gives a parameter at index. If an expectation is set this will try to typecast into that.
 
