@@ -43,31 +43,31 @@ function InstancePath:Resolve(path: string): Instance?
 	local root = self.Root
 	local init = 1
 
+	local instance
 	local unprocessed = path
 
 	if string.match(path, "^%w+") then
-		root = traverse(focus, true, string.match(path, "^%w+"))
+		instance = traverse(focus, true, string.match(path, "^%w+"))
 
 		local _, finish = string.find(path, "^%w+")
 		init = init + finish
 	elseif string.match(path, "^;%w+") then
-		root = game
-		root = traverse(root, true, string.match(path, "%w+"))
+		instance = traverse(root, true, string.match(path, "%w+"))
 
 		local _, finish = string.find(path, "^;%w+")
 		init = init + finish
 	elseif string.match(path, "^;") then
-		root = game
+		instance = root
 
 		local _, finish = string.find(path, "^;")
 		init = init + finish
 	elseif home and string.match(path, "^~") then
-		root = home
+		instance = home
 
 		local _, finish = string.find(path, "^~")
 		init = init + finish
 	elseif string.match(path, "^%.%.") then
-		root = traverse(focus)
+		instance = traverse(focus)
 
 		local _, finish = string.find(path, "^%.%.")
 		init = init + finish
@@ -82,12 +82,12 @@ function InstancePath:Resolve(path: string): Instance?
 			return
 		end
 
-		root = value
+		instance = value
 
 		local _, finish = string.find(path, "^%.%w+")
 		init = init + finish
 	elseif string.match(path, "^%.") then
-		root = focus
+		instance = focus
 
 		local _, finish = string.find(path, "^%.")
 		init = init + finish
@@ -95,7 +95,6 @@ function InstancePath:Resolve(path: string): Instance?
 		return
 	end
 
-	local instance = root
 	local n = 0
 
 	while init <= path:len() and n < MAX_INSTANCE_PATH_RESOLVE do
