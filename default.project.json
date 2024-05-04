@@ -33,6 +33,12 @@
           "$path": "tests/TestMicroTerminal.server.luau"
         }
       }
+    },
+
+    "ServerScriptService": {
+      "BasicExample": {
+        "$path": "examples/basic.server.luau"
+      }
     }
   }
 }
