@@ -1,43 +1,12 @@
 {
-  "name": "MicroTerminal",
+  "name": "microterminal",
   "tree": {
-    "$className": "DataModel",
+    "$path": "src",
 
-    "ServerStorage": {
-      "MicroTerminal": {
-        "$path": "src",
-
-        "Packages": {
-          "$path": "Packages"
-        }
-      },
-      "ImpPlugin": {
-        "$className": "Folder",
-
-        "MicroTerminal": {
-          "$path": "src",
-
-          "Packages": {
-            "$path": "Packages"
-          }
-        },
-        "ImpMain": {
-          "$path": "examples/imp.server.luau"
-        }
-      },
-      
-      "BytLocalSync": {
-        "$className": "Folder",
-
-        "TestMicroTerminal": {
-          "$path": "tests/TestMicroTerminal.server.luau"
-        }
-      }
-    },
-
-    "ServerScriptService": {
-      "BasicExample": {
-        "$path": "examples/basic.server.luau"
+    "Packages": {
+      "$className":"Folder",
+      "goodsignal": {
+        "$path": "./../../stravant_goodsignal@0.2.1/goodsignal/src"
       }
     }
   }
