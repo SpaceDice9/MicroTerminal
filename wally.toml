@@ -1,8 +1,10 @@
 [package]
 name = "spacedice9/microterminal"
-version = "1.0.0"
+version = "1.0.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
+
+description = "Simple library enabling CLI-like plugins in Roblox"
 
 [dependencies]
 goodsignal = "stravant/goodsignal@0.2.1"
