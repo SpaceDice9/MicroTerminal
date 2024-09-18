@@ -4,21 +4,19 @@
 	  "$className": "DataModel",
   
 	  "ServerStorage": {
-			"MicroTerminal": {
-				"$path": "src",
-		
-				"Packages": {
-					"$path": "Packages"
+			"Packages": {
+				"$path": "Packages",
+				"MicroTerminal": {
+					"$path": "src"
 				}
 			},
 			"ImpPlugin": {
 				"$className": "Folder",
 		
-				"MicroTerminal": {
-					"$path": "src",
-			
-					"Packages": {
-						"$path": "Packages"
+				"Packages": {
+					"$path": "Packages",
+					"MicroTerminal": {
+						"$path": "src"
 					}
 				},
 				"ImpMain": {

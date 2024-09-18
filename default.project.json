@@ -1,13 +1,6 @@
 {
   "name": "microterminal",
   "tree": {
-    "$path": "src",
-
-    "Packages": {
-      "$className":"Folder",
-      "goodsignal": {
-        "$path": "./../../stravant_goodsignal@0.2.1/goodsignal/src"
-      }
-    }
+    "$path": "src"
   }
 }

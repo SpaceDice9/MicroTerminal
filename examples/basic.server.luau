@@ -1,4 +1,4 @@
-local MicroTerminal = require(game.ServerStorage.MicroTerminal)
+local MicroTerminal = require(game.ServerStorage.Packages.MicroTerminal)
 
 -- Use while playtesting
 function command(runContext: MicroTerminal.RunContext)

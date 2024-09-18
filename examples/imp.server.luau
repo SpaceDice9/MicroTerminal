@@ -6,7 +6,7 @@
 
 local Selection = game:GetService("Selection")
 
-local MicroTerminal = require(script.Parent.MicroTerminal)
+local MicroTerminal = require(script.Parent.Packages.MicroTerminal)
 
 function toAssetUrl(assetId)
 	return `rbxassetid://{assetId}`

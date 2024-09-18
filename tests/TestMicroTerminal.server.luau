@@ -1,7 +1,8 @@
 --[[ Test for MicroTerminal ]]
 
 local BytLib = require(script.BytLib)
-local microTerminal = BytLib.Require(game.ServerStorage.MicroTerminal)
+local tempPackages = game.ServerStorage.Packages:Clone()
+local microTerminal = require(tempPackages.MicroTerminal) -- absurd monkey gymnastics
 
 print("        [[ Test MicroTerminal ]]")
 
